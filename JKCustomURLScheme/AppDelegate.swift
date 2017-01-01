@@ -41,6 +41,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        // When you type customSchemeExample://red in the search bar in Safari
+        let urlScheme = url.scheme //[URL_scheme]
+        let host = url.host //red
+
+        // When you type customSchemeExample://?backgroundColor=red or customSchemeExample://?backgroundColor=green
+
+        let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: false)
+        let items = (urlComponents?.queryItems)! as [NSURLQueryItem] // {name = backgroundcolor, value = red}
+        if (url.scheme  == "customschemeexample") {
+            var color: UIColor? = nil
+            var vcTitle = ""
+            if let _ = items.first, let propertyName = items.first?.name, let propertyValue = items.first?.value {
+                vcTitle = propertyName
+                if (propertyValue == "red") {
+                    color = .red
+                } else if (propertyValue == "green") {
+                    color = .green
+                }
+            }
+
+
+            if (color != nil) {
+                let vc = UIViewController()
+                vc.view.backgroundColor = color
+                vc.title = vcTitle
+                let navController = UINavigationController(rootViewController: vc)
+                let barButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismiss))
+                vc.navigationItem.leftBarButtonItem = barButtonItem
+                self.window?.rootViewController?.present(navController, animated: true, completion: nil)
+                return true
+            }
+        }
+        return false
+    }
+
+    func dismiss() {
+        self.window?.rootViewController?.dismiss(animated: true, completion: nil)
+    }
+
 
 }
 
